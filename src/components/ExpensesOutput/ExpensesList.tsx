@@ -1,5 +1,6 @@
 import { FlatList, ListRenderItemInfo, Text } from 'react-native'
 import { IExpense } from '../../Interfaces/IExpense'
+import { ExpenseItem } from './ExpenseItem'
 
 type Props = {
     expenses: IExpense[]
@@ -7,7 +8,7 @@ type Props = {
 
 const renderExpenseItem = (itemData: ListRenderItemInfo<IExpense>) => {
     return (
-        <Text>{itemData.item.description}</Text>
+        <ExpenseItem expense={itemData.item}/>
     )
 }
 
