@@ -1,4 +1,6 @@
-export const DummyExpenses = [
+import { IExpense } from "../Interfaces/IExpense";
+
+export const DummyExpenses: IExpense[] = [
     {
         id: "e1",
         description: "A pair of shoes",
@@ -28,5 +30,11 @@ export const DummyExpenses = [
         description: "Another book",
         amount: 18.99,
         date: new Date("2024-02-18"),
+    },
+    {
+        id: "e6",
+        description: "A pair of shoes",
+        amount: 59.99,
+        date: new Date("2024-01-19"),
     }
 ]

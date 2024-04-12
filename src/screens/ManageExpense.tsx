@@ -1,14 +1,17 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Text, View, StyleSheet } from 'react-native'
 import { RootStackParamList } from '../types/RootStackNavigation'
-import { useLayoutEffect } from 'react'
+import { useContext, useLayoutEffect } from 'react'
 import { IconButton } from '../components/ui/IconButton'
 import { GlobalStyles } from '../constants/styles'
 import { Button } from '../components/ui/Button'
+import { ExpensesContext } from '../store/expense-context'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ManageExpense'>
 
 export const ManageExpense = ({ route, navigation }:Props) => {
+    const expensesCtx = useContext(ExpensesContext)
+
     const editedExpenseId = route.params?.expenseId
     const isEditing = !!editedExpenseId
 
@@ -19,6 +22,8 @@ export const ManageExpense = ({ route, navigation }:Props) => {
     },[navigation, isEditing])
 
     const deleteHandler = () => {
+        if(expensesCtx && editedExpenseId) expensesCtx.deleteExpense(editedExpenseId)
+       
         navigation.goBack()
     }
 
@@ -27,6 +32,20 @@ export const ManageExpense = ({ route, navigation }:Props) => {
     }
 
     const confirmHandler = () => {
+        if(isEditing){
+            expensesCtx?.updateExpense(editedExpenseId,
+                {
+                    description: 'test',
+                    amount: 19.99,
+                    date: new Date('2024-04-11'),
+                })
+        }else{
+            expensesCtx?.addExpense({
+                description: 'test',
+                amount: 19.99,
+                date: new Date('2024-04-11'),
+            })
+        }
         navigation.goBack()
     }
 
