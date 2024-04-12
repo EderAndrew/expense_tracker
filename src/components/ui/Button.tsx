@@ -4,12 +4,12 @@ import { GlobalStyles } from "../../constants/styles"
 type Props = {
     children: React.ReactNode,
     onPress: () => void,
-    mode: string,
+    mode?: string,
     style?: object
 }
 export const Button = ({ children, onPress, mode, style }: Props) => {
     return (
-        <View>
+        <View style={style}>
             <Pressable onPress={onPress} style={({pressed}) => pressed && styles.pressed}>
                 <View style={[styles.button, mode === 'flat' && styles.flat]}>
                     <Text style={[styles.buttonText, mode === 'flat' && styles.flat]}>{children}</Text>

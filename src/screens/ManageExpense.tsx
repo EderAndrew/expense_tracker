@@ -6,6 +6,8 @@ import { IconButton } from '../components/ui/IconButton'
 import { GlobalStyles } from '../constants/styles'
 import { Button } from '../components/ui/Button'
 import { ExpensesContext } from '../store/expense-context'
+import { ExpenseForm } from '../components/ManageExpense/ExpenseForm'
+import { IExpense } from '../Interfaces/IExpense'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ManageExpense'>
 
@@ -14,6 +16,8 @@ export const ManageExpense = ({ route, navigation }:Props) => {
 
     const editedExpenseId = route.params?.expenseId
     const isEditing = !!editedExpenseId
+
+    const selectedExpense = expensesCtx.expenses.find((expense) => expense.id === editedExpenseId)
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -31,30 +35,23 @@ export const ManageExpense = ({ route, navigation }:Props) => {
         navigation.goBack()
     }
 
-    const confirmHandler = () => {
+    const confirmHandler = (data: IExpense) => {
         if(isEditing){
-            expensesCtx?.updateExpense(editedExpenseId,
-                {
-                    description: 'test',
-                    amount: 19.99,
-                    date: new Date('2024-04-11'),
-                })
+            expensesCtx?.updateExpense(editedExpenseId, data)
         }else{
-            expensesCtx?.addExpense({
-                description: 'test',
-                amount: 19.99,
-                date: new Date('2024-04-11'),
-            })
+            expensesCtx?.addExpense(data)
         }
         navigation.goBack()
     }
 
     return(
         <View style={styles.container}>
-            <View style={styles.buttons}>
-                <Button style={styles.button} mode="flat" onPress={cancelHandler}>Cancel</Button>
-                <Button style={styles.button} mode="flat" onPress={confirmHandler}>{isEditing ? 'Update' : 'Add'}</Button>
-            </View>
+            <ExpenseForm
+                onCancel={cancelHandler}
+                onConfirm={confirmHandler}
+                isEditing={isEditing}
+                defaultValues={selectedExpense}
+            />
             {isEditing && (
                <View style={styles.deleteContainer}>
                  <IconButton
@@ -75,15 +72,6 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 24,
         backgroundColor: GlobalStyles.colors.primary800
-    },
-    buttons:{
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    button:{
-       width: 120,
-       marginHorizontal: 8 
     },
     deleteContainer:{
         marginTop: 16,
