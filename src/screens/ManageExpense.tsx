@@ -9,11 +9,13 @@ import { ExpenseForm } from '../components/ManageExpense/ExpenseForm'
 import { IExpense } from '../Interfaces/IExpense'
 import { deleteExpense, storeExpense, updateExpense } from '../util/http'
 import { LoadingOverlay } from '../components/ui/LoadingOverlay'
+import { ErrorOverlay } from '../components/ui/ErrorOverlay'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ManageExpense'>
 
 export const ManageExpense = ({ route, navigation }:Props) => {
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [error, setError] = useState('')
     const expensesCtx = useContext(ExpensesContext)
 
     const editedExpenseId = route.params?.expenseId
@@ -29,10 +31,14 @@ export const ManageExpense = ({ route, navigation }:Props) => {
 
     const deleteHandler = async() => {
         setIsSubmitting(true)
+       try{
         await deleteExpense(editedExpenseId as string)
         if(expensesCtx && editedExpenseId) expensesCtx.deleteExpense(editedExpenseId)
        
         navigation.goBack()
+       }catch(err){
+        setError('Could not delete expense - please try again later.')
+       }
     }
 
     const cancelHandler = () => {
@@ -41,14 +47,23 @@ export const ManageExpense = ({ route, navigation }:Props) => {
 
     const confirmHandler = async (data: IExpense) => {
         setIsSubmitting(true)
-        if(isEditing){
-            expensesCtx?.updateExpense(editedExpenseId, data)
-            await updateExpense(editedExpenseId, data)
-        }else{
-            const id = await storeExpense(data)
-            expensesCtx?.addExpense({...data, id})
+        try{
+            if(isEditing){
+                expensesCtx?.updateExpense(editedExpenseId, data)
+                await updateExpense(editedExpenseId, data)
+            }else{
+                const id = await storeExpense(data)
+                expensesCtx?.addExpense({...data, id})
+            }
+            navigation.goBack()
+        }catch(err){
+            setError('Could not save data - please try again later.')
+            setIsSubmitting(false)
         }
-        navigation.goBack()
+    }
+
+    if(error && !isSubmitting){
+        return <ErrorOverlay message={error} onConfirm={() => setError('')}/>
     }
 
     if(isSubmitting){

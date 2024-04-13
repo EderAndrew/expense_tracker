@@ -7,7 +7,7 @@ type Props = {
     onConfirm: () => void
 }
 
-export const ErrorOverlay = ({message,onConfirm}: Props) => {
+export const ErrorOverlay = ({message, onConfirm}: Props) => {
     return (
         <View style={styles.container}>
             <Text style={[styles.text, styles.title]}>An error occurred!</Text>

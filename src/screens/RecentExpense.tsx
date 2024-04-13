@@ -9,7 +9,7 @@ import { ErrorOverlay } from '../components/ui/ErrorOverlay'
 
 export const RecentExpence = () => {
     const [isLoading, setIsLoading] = useState(true)
-    const [error, setError] =  useState()
+    const [error, setError] =  useState('')
 
     const expensesCtx = useContext(ExpensesContext)
     
@@ -28,7 +28,7 @@ export const RecentExpence = () => {
     },[])
 
     const errorHandler = () => {
-        setError(null)
+        setError('')
     }
 
     if(error && !isLoading){
