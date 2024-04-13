@@ -14,7 +14,7 @@ type Props = {
 export const ExpensesOutput = ({ expenses, expensesPeriod, fallbackText }:Props) => {
     let content = <Text style={style.infoText}>{fallbackText}</Text>
 
-    if(expenses.length > 0) {
+    if(expenses?.length > 0) {
         content = <ExpensesList expenses={expenses}/>
     }
 

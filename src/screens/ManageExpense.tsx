@@ -1,17 +1,19 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Text, View, StyleSheet } from 'react-native'
 import { RootStackParamList } from '../types/RootStackNavigation'
-import { useContext, useLayoutEffect } from 'react'
+import { useContext, useLayoutEffect, useState } from 'react'
 import { IconButton } from '../components/ui/IconButton'
 import { GlobalStyles } from '../constants/styles'
-import { Button } from '../components/ui/Button'
 import { ExpensesContext } from '../store/expense-context'
 import { ExpenseForm } from '../components/ManageExpense/ExpenseForm'
 import { IExpense } from '../Interfaces/IExpense'
+import { deleteExpense, storeExpense, updateExpense } from '../util/http'
+import { LoadingOverlay } from '../components/ui/LoadingOverlay'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ManageExpense'>
 
 export const ManageExpense = ({ route, navigation }:Props) => {
+    const [isSubmitting, setIsSubmitting] = useState(false)
     const expensesCtx = useContext(ExpensesContext)
 
     const editedExpenseId = route.params?.expenseId
@@ -25,7 +27,9 @@ export const ManageExpense = ({ route, navigation }:Props) => {
         })
     },[navigation, isEditing])
 
-    const deleteHandler = () => {
+    const deleteHandler = async() => {
+        setIsSubmitting(true)
+        await deleteExpense(editedExpenseId as string)
         if(expensesCtx && editedExpenseId) expensesCtx.deleteExpense(editedExpenseId)
        
         navigation.goBack()
@@ -35,13 +39,20 @@ export const ManageExpense = ({ route, navigation }:Props) => {
         navigation.goBack()
     }
 
-    const confirmHandler = (data: IExpense) => {
+    const confirmHandler = async (data: IExpense) => {
+        setIsSubmitting(true)
         if(isEditing){
             expensesCtx?.updateExpense(editedExpenseId, data)
+            await updateExpense(editedExpenseId, data)
         }else{
-            expensesCtx?.addExpense(data)
+            const id = await storeExpense(data)
+            expensesCtx?.addExpense({...data, id})
         }
         navigation.goBack()
+    }
+
+    if(isSubmitting){
+        return <LoadingOverlay />
     }
 
     return(
